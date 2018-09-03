@@ -79,64 +79,37 @@
 
 (declare context)
 
-(deftype Success [v]
+(defrecord Success [success]
   p/Contextual
   (-get-context [_] context)
 
   p/Extract
-  (-extract [_] v)
+  (-extract [_] success)
 
   p/Printable
   (-repr [_]
-    (str "#<Success " (pr-str v) ">"))
+    (str "#<Success " (pr-str success) ">"))
 
   #?@(:cljs [cljs.core/IDeref
-             (-deref [_] v)]
+             (-deref [_] success)]
       :clj  [clojure.lang.IDeref
-             (deref [_] v)])
+             (deref [_] success)]))
 
-  #?@(:clj
-      [Object
-       (equals [self other]
-         (if (instance? Success other)
-           (= v (.-v ^Success other))
-           false))]
-      :cljs
-      [cljs.core/IEquiv
-       (-equiv [_ other]
-         (if (instance? Success other)
-           (= v (.-v ^Success other))
-           false))]))
-
-(deftype Failure [e]
+(defrecord Failure [failure]
   p/Contextual
   (-get-context [_] context)
 
   p/Extract
-  (-extract [_] e)
+  (-extract [_] failure)
 
   p/Printable
   (-repr [_]
-    (str "#<Failure " (pr-str e) ">"))
+    (str "#<Failure " (pr-str failure) ">"))
 
   #?@(:cljs [cljs.core/IDeref
-             (-deref [_] (throw e))]
+             (-deref [_] (throw failure))]
       :clj  [clojure.lang.IDeref
-             (deref [_] (throw e))])
-
-  #?@(:clj
-      [Object
-       (equals [self other]
-         (if (instance? Failure other)
-           (= e (.-e ^Failure other))
-           false))]
-
-      :cljs
-      [cljs.core/IEquiv
-       (-equiv [_ other]
-         (if (instance? Failure other)
-           (= e (.-e ^Failure other))
-           false))]))
+             (deref [_] (throw failure))]))
 
 (alter-meta! #'->Success assoc :private true)
 (alter-meta! #'->Failure assoc :private true)
@@ -243,7 +216,7 @@
   (let [result (exec-try-on func)]
     (ctx/with-context context
       (if (failure? result)
-        (recoverfn (.-e ^Failure result))
+        (recoverfn (.-failure ^Failure result))
         result))))
 
 #?(:clj

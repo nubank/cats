@@ -1,10 +1,17 @@
 # Changelog #
 
-## Version 2.2.1 ##
+## Version 2.3.0 ##
 
-Date: 2017-07-18
+Date: 2018-08-29
 
-- Fix override of nested contexts
+- Add state monad implementation
+
+## Version 2.2.0 ##
+
+Date: 2018-01-11
+
+- Fix some issues with wrong handling of dynamic context.
+- Convert some functions to macros for delay args evaluation.
 
 ## Version 2.1.0 ##
 

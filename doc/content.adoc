@@ -1,6 +1,6 @@
 = Cats Documentation
 Andrey Antukh & Alejandro Gómez
-2.1.0
+2.3.0
 :toc: left
 :!numbered:
 :idseparator: -
@@ -36,7 +36,7 @@ it as a dependency in your *_project.clj_*:
 
 [source,clojure]
 ----
-[funcool/cats "2.1.0"]
+[funcool/cats "2.2.0"]
 ----
 
 And it works with the following platforms: *jdk7*, *jdk8*, *node*
@@ -1535,7 +1535,7 @@ generic abstraction instread of a specific purpose macro.
 
 * Promise monad: https://github.com/funcool/promesa
 * Concurrent data fetching: https://github.com/funcool/urania
-* Patter matching for the Cats' types: https://github.com/zalando/cats.match
+* Pattern matching for the Cats' types: https://github.com/zalando/cats.match
 
 == FAQ
 

@@ -32,6 +32,8 @@
       (maybe/just 1)
       ;; => #<Just [1]>
   "
+  #?(:cljs
+    (:require-macros [cats.monad.maybe :refer (maybe)]))
   (:require [cats.protocols :as p]
             [cats.context :as ctx]
             [cats.util :as util]))
@@ -40,51 +42,23 @@
 
 (declare context)
 
-(deftype Just [v]
+(defrecord Just [just]
   p/Contextual
   (-get-context [_] context)
 
   p/Extract
-  (-extract [_] v)
+  (-extract [_] just)
 
   p/Printable
   (-repr [_]
-    (str "#<Just " (pr-str v) ">"))
-
-  #?@(:cljs [cljs.core/ILookup
-             (-lookup
-               [this k]
-                 (if (= k :just) @this nil))
-             (-lookup
-               [this k not-found]
-                 (if (= k :just) @this not-found))]
-      :clj  [clojure.lang.ILookup
-             (valAt
-               [this k]
-                 (if (= k :just) @this nil))
-             (valAt
-               [this k not-found]
-                 (if (= k :just) @this not-found))])
+    (str "#<Just " (pr-str just) ">"))
 
   #?@(:cljs [cljs.core/IDeref
-             (-deref [_] v)]
+             (-deref [_] just)]
       :clj  [clojure.lang.IDeref
-             (deref [_] v)])
+             (deref [_] just)]))
 
-  #?@(:clj
-      [Object
-       (equals [self other]
-         (if (instance? Just other)
-           (= v (.-v ^Just other))
-           false))]
-      :cljs
-      [cljs.core/IEquiv
-       (-equiv [_ other]
-         (if (instance? Just other)
-           (= v (.-v ^Just other))
-           false))]))
-
-(deftype Nothing []
+(defrecord Nothing []
   p/Contextual
   (-get-context [_] context)
 
@@ -95,34 +69,10 @@
   (-repr [_]
     "#<Nothing>")
 
-  #?@(:cljs [cljs.core/ILookup
-             (-lookup
-               [this k]
-                 (if (= k :nothing) this nil))
-             (-lookup
-               [this k not-found]
-                 (if (= k :nothing) this not-found))]
-      :clj  [clojure.lang.ILookup
-             (valAt
-               [this k]
-                 (if (= k :nothing) this nil))
-             (valAt
-               [this k not-found]
-                 (if (= k :nothing) this not-found))])
-
   #?@(:cljs [cljs.core/IDeref
              (-deref [_] nil)]
       :clj  [clojure.lang.IDeref
-             (deref [_] nil)])
-
-  #?@(:clj
-      [Object
-       (equals [self other]
-         (instance? Nothing other))]
-      :cljs
-      [cljs.core/IEquiv
-       (-equiv [_ other]
-         (instance? Nothing other))]))
+             (deref [_] nil)]))
 
 (alter-meta! #'->Nothing assoc :private true)
 (alter-meta! #'->Just assoc :private true)
@@ -134,14 +84,10 @@
   "Return true in case of `v` is instance
   of Maybe monad."
   [v]
-  (cond
-    (or (instance? Just v) (instance? Nothing v))
-    true
-
-    (satisfies? p/Contextual v)
-    (identical? (p/-get-context v) context)
-
-    :else false))
+  (or (instance? Just v)
+      (instance? Nothing v)
+      (and (satisfies? p/Contextual v)
+           (identical? (p/-get-context v) context))))
 
 (defn just
   "A Just type constructor."
@@ -152,7 +98,7 @@
 (defn nothing
   "A Nothing type constructor."
   []
-  (Nothing.))
+  (assoc (Nothing.) :nothing nil))
 
 (defn just?
   "Returns true if `v` is an instance
@@ -277,15 +223,17 @@
 
 ;; --- Utility functions
 
-(defn maybe
-  "Given a default value, a maybe and a function, return the default
-  if the maybe is a nothing; if its a just, apply the function to the
-  value it contains and return the result."
-  [default m f]
-  {:pre [(maybe? m)]}
-  (if (nothing? m)
-    default
-    (f (p/-extract m))))
+#?(:clj
+   (defmacro maybe
+     "Given a default value, a maybe and a function, return the default if the
+     maybe is a nothing; if its a just, apply the function to the value it
+     contains and return the result."
+     [default m f]
+     `(do
+        (assert (maybe? ~m) (str "'" ~m "' is not a Maybe monad"))
+        (if (nothing? ~m)
+          ~default
+          (~f (p/-extract ~m))))))
 
 (defn seq->maybe
   "Given a collection, return a nothing if its empty or a just with its
