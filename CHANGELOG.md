@@ -15,12 +15,6 @@ Date: 2018-01-11
 
 ## Version 2.1.0 ##
 
-Date: 2018-08-29
-
-- Add state monad implementation
-
-## Version 2.1.0 ##
-
 Date: 2017-04-20
 
 - Make cats work together with core.match for some types.
