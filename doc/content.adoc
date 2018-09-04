@@ -36,7 +36,11 @@ it as a dependency in your *_project.clj_*:
 
 [source,clojure]
 ----
+<<<<<<< Updated upstream
 [funcool/cats "2.2.0"]
+=======
+[funcool/cats "2.3.0"]
+>>>>>>> Stashed changes
 ----
 
 And it works with the following platforms: *jdk7*, *jdk8*, *node*
