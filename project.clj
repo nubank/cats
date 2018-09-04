@@ -12,6 +12,7 @@
                  [funcool/promesa "1.9.0" :scope "provided"]]
   :repositories [["nu-maven" {:url "s3p://nu-maven/releases/" :snapshots false}]]
   :deploy-repositories [["releases" {:url "s3p://nu-maven/releases/" :no-auth true}]]
+  :plugins [[s3-wagon-private "1.3.1"]]
   :source-paths   ["src"]
   :test-paths     ["test"]
   :jar-exclusions [#"\.swp|\.swo|user\.clj"])
