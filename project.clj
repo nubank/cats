@@ -1,4 +1,4 @@
-(defproject nubank/cats "2.4.2"
+(defproject nubank/cats "2.4.3-SNAPSHOT"
   :description "Category Theory abstractions for Clojure"
   :url         "https://github.com/funcool/cats"
   :license {:name "BSD (2 Clause)"
